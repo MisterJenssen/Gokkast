@@ -39,7 +39,7 @@ void loop()
   { 
     Serial.println(currentSpeed);
     myStepper.setSpeed(currentSpeed); 
-    myStepper.step(6);
+    myStepper.step(10);
     currentSpeed += 5;
   }
 
@@ -50,10 +50,9 @@ void loop()
   { 
     Serial.println(currentSpeed);
     myStepper.setSpeed(currentSpeed); 
-    myStepper.step(6);
+    myStepper.step(10);
     currentSpeed -= 5;
   }
   
   delay(4000);
 }
-
