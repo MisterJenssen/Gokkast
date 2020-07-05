@@ -1,46 +1,49 @@
-#include <AccelStepper.h>
+#include "ReelConfig.hpp"
 #include "SignStruct.hpp"
+#include "OperatingState.hpp"
+#include "Reel.hpp"
 
-#define stepper_wire_1  8
-#define stepper_wire_2  9
-#define stepper_wire_3  10
-#define stepper_wire_4  11
+#define baudrate  9600
 
-#define min_speed         30    //steps/s
-#define max_speed         300   //steps/s
-#define max_acceleration  100   //steps/s/s
+Reel *reel1;
 
 long end_position = 0;
+bool initialise = true;
 
 SignStruct signs[16];
 
-
-AccelStepper stepper(AccelStepper::HALF4WIRE, stepper_wire_1, stepper_wire_2, stepper_wire_3, stepper_wire_4, true); // 2 wires (driver), direction and step
-
+void lightGateInterrupt();
 
 void setup()
 {  
- Serial.begin(9600);
-  
-  pinMode(stepper_wire_1, OUTPUT);
-  pinMode(stepper_wire_2, OUTPUT);
-  pinMode(stepper_wire_3, OUTPUT);
-  pinMode(stepper_wire_4, OUTPUT);
+  Serial.begin(baudrate);
 
-  stepper.setMaxSpeed(max_speed); 
-  stepper.setAcceleration(max_acceleration); 
+  reel1 = new Reel(reel_1_wire_1_pin, reel_1_wire_2_pin, reel_1_wire_3_pin, reel_1_wire_4_pin, reel_1_light_sensor_pin, reel_1_min_speed, reel_1_max_speed, reel_1_min_acceleration, reel_1_max_acceleration);
+  
+  attachInterrupt(digitalPinToInterrupt(reel_1_light_sensor_pin), lightGateInterrupt, FALLING);
 }
 
 void loop()
 {
-    if (Serial.available()) 
-    {
-      end_position = Serial.parseInt(SKIP_ALL, '\n');
-      stepper.moveTo(end_position);
-      Serial.println(end_position);
-    }
+  if(initialise)
+  {
+    reel1->EnableReel();
+    initialise = false;
+  }
   
-    stepper.run();
+  if (Serial.available()) 
+  {
+     end_position = Serial.parseInt(SKIP_ALL, '\n');
+     reel1->MoveTo(end_position);
+     Serial.println(end_position);
+   }
+  
+   reel1->Run();
+}
+
+void lightGateInterrupt()
+{
+  Serial.println("In interrupt");
 }
 
 void SignConstructor()
