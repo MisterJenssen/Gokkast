@@ -1,5 +1,7 @@
 #include "Reel.hpp"
 
+Reel* Reel::this_reel = 0;
+
 Reel::Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int light_sensor_pin, int min_speed, int max_speed, int min_acceleration, int max_acceleration)
             : wire_1_pin(wire_1_pin)
             , wire_2_pin(wire_2_pin)
@@ -13,9 +15,10 @@ Reel::Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int l
 {
   operatingState = disable;
   reel_running = false;
+  interrupt_fired = false;
 
   init_enable = false;
-  init_halt = false;
+  init_initialise = true;
   init_disable = true;
 
   pinMode(wire_1_pin, OUTPUT);
@@ -28,6 +31,9 @@ Reel::Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int l
 
   reel_stepper->setMaxSpeed(max_speed);            //steps per second            [steps / s]
   reel_stepper->setAcceleration(max_acceleration); //steps per second per second [steps / s^2]
+
+  this_reel = this;
+  attachInterrupt(digitalPinToInterrupt(light_sensor_pin), Reel::LightGateInterrupt, FALLING);
 }
 
 
@@ -43,10 +49,10 @@ Reel::~Reel()
 
 
 bool Reel::Run()
-{
+{  
   switch (operatingState)
   {
-    case disable:
+    case disable:    
       if (init_disable)
       {
         InitDisableState();
@@ -56,13 +62,24 @@ bool Reel::Run()
       
       break;
 
-    case halt:
-      if (init_halt)
+    case initialise:
+      if (init_initialise)
       {
-        InitHaltState();
+        InitInitialiseState();
+
+        reel_stepper->setSpeed(min_speed); 
+
+      }
+      if(interrupt_fired)
+      {
+        reel_stepper->stop();
+        interrupt_fired = false;
+        DisableReel();
+        return false;
       }
 
-      delay(10);
+      reel_stepper->runSpeed();
+      return true;
       
       break;
 
@@ -72,7 +89,8 @@ bool Reel::Run()
         InitEnableState();
       }
 
-      reel_running = reel_stepper->run();
+      reel_stepper->run();
+      reel_running = reel_stepper->distanceToGo() != 0;
        
       break;      
   }
@@ -86,18 +104,33 @@ void Reel::MoveTo(int reel_position)
 }
 
 
+void Reel::LightGateInterruptHandler()
+{
+  interrupt_fired = true;
+}
+
+
+void Reel::LightGateInterrupt()
+{
+  if(this_reel != 0)
+  {
+    this_reel->LightGateInterruptHandler();
+  }  
+}
+
+
 void Reel::InitEnableState()
 {
   init_enable = false;
-  init_halt = true;
+  init_initialise = true;
   init_disable = true;
 }
 
 
-void Reel::InitHaltState()
+void Reel::InitInitialiseState()
 {
   init_enable = true;
-  init_halt = false;  
+  init_initialise = false;  
   init_disable = true;
 }
 
@@ -105,7 +138,7 @@ void Reel::InitHaltState()
 void Reel::InitDisableState()
 {
   init_enable = true;
-  init_halt = true;
+  init_initialise = true;
   init_disable = false;  
 }
 
@@ -116,9 +149,9 @@ void Reel::EnableReel()
 }
 
 
-void Reel::HaltReel()
+void Reel::InitialiseReel()
 {
-  operatingState = halt;
+  operatingState = initialise;
 }
 
 

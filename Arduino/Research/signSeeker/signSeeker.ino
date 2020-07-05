@@ -8,7 +8,8 @@
 Reel *reel1;
 
 long end_position = 0;
-bool initialise = true;
+bool initialise_reel = true;
+bool reel_running = false;
 
 SignStruct signs[16];
 
@@ -20,31 +21,35 @@ void setup()
 
   reel1 = new Reel(reel_1_wire_1_pin, reel_1_wire_2_pin, reel_1_wire_3_pin, reel_1_wire_4_pin, reel_1_light_sensor_pin, reel_1_min_speed, reel_1_max_speed, reel_1_min_acceleration, reel_1_max_acceleration);
   
-  attachInterrupt(digitalPinToInterrupt(reel_1_light_sensor_pin), lightGateInterrupt, FALLING);
+  
 }
 
 void loop()
 {
-  if(initialise)
+  if(initialise_reel)
   {
-    reel1->EnableReel();
-    initialise = false;
+    reel1->InitialiseReel();
+    initialise_reel = false;
+    
+    reel_running = true;    
   }
+  if(!reel_running)
+  {      
+    reel1->DisableReel();
+  }
+  
   
   if (Serial.available()) 
   {
      end_position = Serial.parseInt(SKIP_ALL, '\n');
      reel1->MoveTo(end_position);
      Serial.println(end_position);
+     reel1->EnableReel();
    }
   
-   reel1->Run();
+   reel_running = reel1->Run();
 }
 
-void lightGateInterrupt()
-{
-  Serial.println("In interrupt");
-}
 
 void SignConstructor()
 {

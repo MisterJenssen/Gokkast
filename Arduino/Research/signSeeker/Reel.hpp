@@ -21,14 +21,19 @@ class Reel
     
     AccelStepper *reel_stepper;
     OperatingState operatingState;
+
+    static Reel* this_reel;
+    void LightGateInterruptHandler();    
+    static void LightGateInterrupt();
     
     bool reel_running;
+    bool interrupt_fired;
     bool init_enable;
-    bool init_halt;
-    bool init_disable;
-    
+    bool init_initialise;
+    bool init_disable;    
+
     void InitEnableState();
-    void InitHaltState();
+    void InitInitialiseState();
     void InitDisableState();
 
   public:
@@ -37,7 +42,7 @@ class Reel
     bool Run();
     void MoveTo(int reel_position);
     void EnableReel();
-    void HaltReel();
+    void InitialiseReel();
     void DisableReel();
 };
 

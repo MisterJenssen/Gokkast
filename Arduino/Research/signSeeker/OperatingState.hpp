@@ -3,8 +3,8 @@
 
 enum OperatingState 
 {
+  initialise,
   enable,
-  halt,
   disable
 };
 
