@@ -6,12 +6,16 @@
 #define stepper_wire_3  10
 #define stepper_wire_4  11
 
+#define min_speed         30    //steps/s
+#define max_speed         300   //steps/s
+#define max_acceleration  100   //steps/s/s
+
 long end_position = 0;
 
 SignStruct signs[16];
 
 
-AccelStepper stepper(AccelStepper::FULL4WIRE, stepper_wire_1, stepper_wire_2, stepper_wire_3, stepper_wire_4, true); // 2 wires (driver), direction and step
+AccelStepper stepper(AccelStepper::HALF4WIRE, stepper_wire_1, stepper_wire_2, stepper_wire_3, stepper_wire_4, true); // 2 wires (driver), direction and step
 
 
 void setup()
@@ -23,8 +27,8 @@ void setup()
   pinMode(stepper_wire_3, OUTPUT);
   pinMode(stepper_wire_4, OUTPUT);
 
-  stepper.setMaxSpeed(150); // steps/s
-  stepper.setAcceleration(20); // steps/s/s
+  stepper.setMaxSpeed(max_speed); 
+  stepper.setAcceleration(max_acceleration); 
 }
 
 void loop()
