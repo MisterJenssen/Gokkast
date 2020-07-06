@@ -29,12 +29,13 @@ class Reel
     bool reel_running;
     bool interrupt_fired;
     bool init_enable;
-    bool init_initialise;
+    bool init_home;
     bool init_disable;    
 
     void InitEnableState();
-    void InitInitialiseState();
+    void InitHomingState();
     void InitDisableState();
+    bool ReelAtHomePosition();
 
   public:
     Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int light_sensor_pin, int min_speed, int max_speed, int min_acceleration, int max_acceleration);
@@ -42,7 +43,7 @@ class Reel
     bool Run();
     void MoveTo(int reel_position);
     void EnableReel();
-    void InitialiseReel();
+    void HomeReel();
     void DisableReel();
 };
 

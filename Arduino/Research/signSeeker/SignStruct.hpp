@@ -6,7 +6,7 @@
 struct SignStruct
 {
   SignSymbol symbol;
-  int position;
+  double position;
   String info;
 };
 

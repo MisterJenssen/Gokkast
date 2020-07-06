@@ -18,7 +18,7 @@ Reel::Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int l
   interrupt_fired = false;
 
   init_enable = false;
-  init_initialise = true;
+  init_home = true;
   init_disable = true;
 
   pinMode(wire_1_pin, OUTPUT);
@@ -63,17 +63,18 @@ bool Reel::Run()
       break;
 
     case initialise:
-      if (init_initialise)
+      if (init_home)
       {
-        InitInitialiseState();
+        InitHomingState();
 
         reel_stepper->setSpeed(min_speed); 
 
       }
-      if(interrupt_fired)
+      if(interrupt_fired || ReelAtHomePosition())
       {
         reel_stepper->stop();
         interrupt_fired = false;
+        reel_stepper->setCurrentPosition(0);
         DisableReel();
         return false;
       }
@@ -104,6 +105,12 @@ void Reel::MoveTo(int reel_position)
 }
 
 
+bool Reel::ReelAtHomePosition()
+{
+  return !digitalRead(light_sensor_pin);
+}
+
+
 void Reel::LightGateInterruptHandler()
 {
   interrupt_fired = true;
@@ -122,15 +129,15 @@ void Reel::LightGateInterrupt()
 void Reel::InitEnableState()
 {
   init_enable = false;
-  init_initialise = true;
+  init_home = true;
   init_disable = true;
 }
 
 
-void Reel::InitInitialiseState()
+void Reel::InitHomingState()
 {
   init_enable = true;
-  init_initialise = false;  
+  init_home = false;  
   init_disable = true;
 }
 
@@ -138,7 +145,7 @@ void Reel::InitInitialiseState()
 void Reel::InitDisableState()
 {
   init_enable = true;
-  init_initialise = true;
+  init_home = true;
   init_disable = false;  
 }
 
@@ -149,7 +156,7 @@ void Reel::EnableReel()
 }
 
 
-void Reel::InitialiseReel()
+void Reel::HomeReel()
 {
   operatingState = initialise;
 }
