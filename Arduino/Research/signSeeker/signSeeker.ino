@@ -23,9 +23,6 @@ void setup()
 
   reel1 = new Reel(reel_1_wire_1_pin, reel_1_wire_2_pin, reel_1_wire_3_pin, reel_1_wire_4_pin, reel_1_light_sensor_pin, reel_1_min_speed, reel_1_max_speed, reel_1_min_acceleration, reel_1_max_acceleration);
   SignConstructor();
-  
-  Serial.print("degrees per step: "); Serial.println(degrees_per_step);
-  Serial.print("degrees per sign: "); Serial.println(degrees_per_sign);
 }
 
 void loop()
@@ -53,7 +50,7 @@ void loop()
      }
      else
      {
-        int end_pos = tmp_pos * ((double)degrees_per_sign / (double)degrees_per_step);
+        int end_pos = tmp_pos * (degrees_per_sign / degrees_per_step);
         Serial.print("end_pos: "); Serial.println(end_pos);
         reel1->MoveTo(end_pos);
 
