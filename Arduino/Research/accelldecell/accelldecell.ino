@@ -1,65 +1,65 @@
-#include <AccelStepper.h>
+#include "ReelConfig.hpp"
+#include "OperatingState.hpp"
+#include "Reel.hpp"
 
-#define stepper_wire_1  8
-#define stepper_wire_2  9
-#define stepper_wire_3  10
-#define stepper_wire_4  11
+#define baudrate  9600
 
-#define light_gate_pin  2
+Reel *reel1;
+Reel *reel2;
 
-#define end_position      1000  //steps
-#define min_speed         30    //steps/s
-#define max_speed         300   //steps/s
-#define max_acceleration  100   //steps/s/s
+int end_pos1 = -1000;
+int end_pos2 = 1000;
 
-AccelStepper stepper(AccelStepper::HALF4WIRE, stepper_wire_1, stepper_wire_2, stepper_wire_3, stepper_wire_4, true); // 2 wires (driver), direction and step
-void lightGateInterrupt();
+//void lightGateInterrupt();
 
 void setup()
 {  
- Serial.begin(9600);
-  
-  pinMode(stepper_wire_1, OUTPUT);
-  pinMode(stepper_wire_2, OUTPUT);
-  pinMode(stepper_wire_3, OUTPUT);
-  pinMode(stepper_wire_4, OUTPUT);
-  pinMode(light_gate_pin, INPUT);
+  Serial.begin(baudrate);
 
-  attachInterrupt(digitalPinToInterrupt(light_gate_pin), lightGateInterrupt, CHANGE);
+  reel1 = new Reel(reel_1_wire_1_pin, reel_1_wire_2_pin, reel_1_wire_3_pin, reel_1_wire_4_pin, reel_1_light_sensor_pin, reel_1_min_speed, reel_1_max_speed, reel_1_min_acceleration, reel_1_max_acceleration);
+  reel2 = new Reel(reel_2_wire_1_pin, reel_2_wire_2_pin, reel_2_wire_3_pin, reel_2_wire_4_pin, reel_2_light_sensor_pin, reel_2_min_speed, reel_2_max_speed, reel_2_min_acceleration, reel_2_max_acceleration);
 
-  stepper.setMaxSpeed(max_speed);
-  stepper.setAcceleration(max_acceleration);
+  reel1->MoveTo(end_pos1);
+  reel2->MoveTo(end_pos2);
 
-  //stepper.setSpeed(250);
-  stepper.moveTo(end_position);
+  reel1->EnableReel();
+  reel2->EnableReel();
 }
 
 void loop()
 {
-    if (stepper.distanceToGo() == 0) // If at the end of travel go to the other end
-    {
-      delay(2000);
-      stepper.moveTo(-stepper.currentPosition());
-    }
-    stepper.run();
-
+   bool reel1_running = reel1->Run();
+   bool reel2_running = reel2->Run();
+   if(reel1->StepsToGo() == 0)
+   {
+      end_pos1 =  -end_pos1;
+      reel1->MoveTo(end_pos1);   
+   }
+   if(reel2->StepsToGo() == 0)
+   {
+      end_pos2 =  -end_pos2;
+      reel2->MoveTo(end_pos2);   
+   }
 
     if (Serial.available()) 
     {
       char inChar = (char)Serial.read();
       if(inChar=='S') 
       {
-        stepper.stop();
-        stepper.disableOutputs();
-        Serial.println(stepper.currentPosition());
+        reel1->DisableReel();
+        reel2->DisableReel();
+
+        Serial.println("Reels stopped");
         while(true);
       }
     }   
 }
 
+/*
 void lightGateInterrupt()
 {
     int value = digitalRead(light_gate_pin);
     Serial.print("Value: ");
     Serial.println(value);
 }
+*/
