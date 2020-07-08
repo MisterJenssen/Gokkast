@@ -6,6 +6,7 @@
 #define baudrate  9600
 
 Reel *reel1;
+Reel *reel2;
 
 bool initialise_reel = true;
 bool reel_running = false;
@@ -22,6 +23,7 @@ void setup()
   Serial.begin(baudrate);
 
   reel1 = new Reel(reel_1_wire_1_pin, reel_1_wire_2_pin, reel_1_wire_3_pin, reel_1_wire_4_pin, reel_1_light_sensor_pin, reel_1_min_speed, reel_1_max_speed, reel_1_min_acceleration, reel_1_max_acceleration);
+  reel2 = new Reel(reel_2_wire_1_pin, reel_2_wire_2_pin, reel_2_wire_3_pin, reel_2_wire_4_pin, reel_2_light_sensor_pin, reel_2_min_speed, reel_2_max_speed, reel_2_min_acceleration, reel_2_max_acceleration);
   SignConstructor();
 }
 
@@ -30,6 +32,7 @@ void loop()
   if(initialise_reel)
   {
     reel1->HomeReel();
+    reel2->HomeReel();
     initialise_reel = false;
     
     reel_running = true;    
@@ -37,6 +40,7 @@ void loop()
   if(!reel_running)
   {      
     reel1->DisableReel();
+    reel2->DisableReel();
   }
   
   
@@ -53,14 +57,27 @@ void loop()
         int end_pos = tmp_pos * (degrees_per_sign / degrees_per_step);
         Serial.print("end_pos: "); Serial.println(end_pos);
         reel1->MoveTo(end_pos);
+        reel2->MoveTo(end_pos);
 
         String tmp_string = reel1_signs[tmp_pos].info;
         Serial.print("Sign: "); Serial.println(tmp_string);
         reel1->EnableReel();
+        reel2->EnableReel();
      }
    }
-  
-   reel_running = reel1->Run();
+
+   bool reel1_running = reel1->Run();
+   bool reel2_running = reel2->Run();
+
+   if(reel1_running || reel2_running)
+   {
+      reel_running =  true;
+   
+   }
+   else
+   {
+      reel_running = false;
+   }   
 }
 
 

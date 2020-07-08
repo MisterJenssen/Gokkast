@@ -56,6 +56,7 @@ bool Reel::Run()
       if (init_disable)
       {
         InitDisableState();
+        reel_stepper->disableOutputs();
       }
       
       delay(10);
