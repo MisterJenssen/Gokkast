@@ -13,7 +13,7 @@ int random_number1;
 int random_number2;
 int random_number3;
 
-bool initialise_reel = true;
+bool initialise_reels = true;
 bool reels_running = false;
 
 double degrees_per_step = 360.0 / reel_1_steps_per_rev;
@@ -37,12 +37,12 @@ void setup()
 
 void loop()
 {
-  if (initialise_reel)
+  if (initialise_reels)
   {
     reel1->HomeReel();
     reel2->HomeReel();
     reel3->HomeReel();
-    initialise_reel = false;
+    initialise_reels = false;
 
     reels_running = true;
   }
