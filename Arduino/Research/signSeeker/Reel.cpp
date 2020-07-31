@@ -3,15 +3,15 @@
 Reel* Reel::this_reel = 0;
 
 Reel::Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int light_sensor_pin, int min_speed, int max_speed, int min_acceleration, int max_acceleration)
-            : wire_1_pin(wire_1_pin)
-            , wire_2_pin(wire_2_pin)
-            , wire_3_pin(wire_3_pin)
-            , wire_4_pin(wire_4_pin)
-            , light_sensor_pin(light_sensor_pin)
-            , min_speed(min_speed)
-            , max_speed(max_speed)
-            , min_acceleration(min_acceleration)
-            , max_acceleration(max_acceleration)
+  : wire_1_pin(wire_1_pin)
+  , wire_2_pin(wire_2_pin)
+  , wire_3_pin(wire_3_pin)
+  , wire_4_pin(wire_4_pin)
+  , light_sensor_pin(light_sensor_pin)
+  , min_speed(min_speed)
+  , max_speed(max_speed)
+  , min_acceleration(min_acceleration)
+  , max_acceleration(max_acceleration)
 {
   operatingState = disable;
   reel_running = false;
@@ -26,7 +26,7 @@ Reel::Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int l
   pinMode(wire_3_pin, OUTPUT);
   pinMode(wire_4_pin, OUTPUT);
   pinMode(light_sensor_pin, INPUT);
-  
+
   reel_stepper = new AccelStepper(AccelStepper::HALF4WIRE, wire_1_pin, wire_2_pin, wire_3_pin, wire_4_pin, true);
 
   reel_stepper->setMaxSpeed(max_speed);            //steps per second            [steps / s]
@@ -39,29 +39,29 @@ Reel::Reel(int wire_1_pin, int wire_2_pin, int wire_3_pin, int wire_4_pin, int l
 
 Reel::~Reel()
 {
-  if(reel_stepper != NULL)
+  if (reel_stepper != NULL)
   {
     reel_stepper->stop();
     delete reel_stepper;
-    reel_stepper = NULL; 
-  }  
+    reel_stepper = NULL;
+  }
 }
 
 
 bool Reel::Run()
-{  
+{
   switch (operatingState)
   {
-    case disable:    
+    case disable:
       if (init_disable)
       {
         InitDisableState();
         reel_stepper->stop();
         reel_stepper->disableOutputs();
       }
-      
+
       delay(10);
-      
+
       break;
 
     case initialise:
@@ -69,10 +69,10 @@ bool Reel::Run()
       {
         InitHomingState();
 
-        reel_stepper->setSpeed(min_speed); 
+        reel_stepper->setSpeed(min_speed);
 
       }
-      if(interrupt_fired || ReelAtHomePosition())
+      if (interrupt_fired || ReelAtHomePosition())
       {
         reel_stepper->stop();
         interrupt_fired = false;
@@ -83,7 +83,7 @@ bool Reel::Run()
 
       reel_stepper->runSpeed();
       return true;
-      
+
       break;
 
     case enable:
@@ -94,8 +94,8 @@ bool Reel::Run()
 
       reel_stepper->run();
       reel_running = StepsToGo() != 0;
-       
-      break;      
+
+      break;
   }
   return reel_running;
 }
@@ -126,10 +126,10 @@ void Reel::LightGateInterruptHandler()
 
 void Reel::LightGateInterrupt()
 {
-  if(this_reel != 0)
+  if (this_reel != 0)
   {
     this_reel->LightGateInterruptHandler();
-  }  
+  }
 }
 
 
@@ -144,7 +144,7 @@ void Reel::InitEnableState()
 void Reel::InitHomingState()
 {
   init_enable = true;
-  init_home = false;  
+  init_home = false;
   init_disable = true;
 }
 
@@ -153,7 +153,7 @@ void Reel::InitDisableState()
 {
   init_enable = true;
   init_home = true;
-  init_disable = false;  
+  init_disable = false;
 }
 
 

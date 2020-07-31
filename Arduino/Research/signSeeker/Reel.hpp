@@ -18,19 +18,19 @@ class Reel
     int max_speed;
     int min_acceleration;
     int max_acceleration;
-    
+
     AccelStepper *reel_stepper;
     OperatingState operatingState;
 
     static Reel* this_reel;
-    void LightGateInterruptHandler();    
+    void LightGateInterruptHandler();
     static void LightGateInterrupt();
-    
+
     bool reel_running;
     bool interrupt_fired;
     bool init_enable;
     bool init_home;
-    bool init_disable;    
+    bool init_disable;
 
     void InitEnableState();
     void InitHomingState();

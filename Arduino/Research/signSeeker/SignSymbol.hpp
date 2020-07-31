@@ -1,7 +1,7 @@
 #ifndef SIGNSYMBOL_H
 #define SIGNSYMBOL_H
 
-enum SignSymbol 
+enum SignSymbol
 {
   red_x,
   blue_x,

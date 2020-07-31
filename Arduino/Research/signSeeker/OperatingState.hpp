@@ -1,7 +1,7 @@
 #ifndef OPERATINGSTATE_H
 #define OPERATINGSTATE_H
 
-enum OperatingState 
+enum OperatingState
 {
   initialise,
   enable,
