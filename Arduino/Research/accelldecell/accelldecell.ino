@@ -12,11 +12,9 @@ int end_pos1 = 500;
 int end_pos2 = 750;
 int end_pos3 = 1000;
 
-//void lightGateInterrupt();
-
 void setup()
 {  
-  //Serial.begin(baudrate);  
+  Serial.begin(baudrate);  
 
   reel1 = new Reel(reel_1_wire_1_pin, reel_1_wire_2_pin, reel_1_wire_3_pin, reel_1_wire_4_pin, reel_1_light_sensor_pin, reel_1_min_speed, reel_1_max_speed, reel_1_min_acceleration, reel_1_max_acceleration);
   reel2 = new Reel(reel_2_wire_1_pin, reel_2_wire_2_pin, reel_2_wire_3_pin, reel_2_wire_4_pin, reel_2_light_sensor_pin, reel_2_min_speed, reel_2_max_speed, reel_2_min_acceleration, reel_2_max_acceleration);
@@ -54,7 +52,6 @@ void loop()
       reel3->MoveTo(end_pos3);   
    }
 
-   /*
     if (Serial.available()) 
     {
       char inChar = (char)Serial.read();
@@ -67,14 +64,5 @@ void loop()
         Serial.println("Reels stopped");
         while(true);
       }
-    } */   
+    }  
 }
-
-/*
-void lightGateInterrupt()
-{
-    int value = digitalRead(light_gate_pin);
-    Serial.print("Value: ");
-    Serial.println(value);
-}
-*/
